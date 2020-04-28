@@ -1,4 +1,4 @@
-var mongoose = require('./mongo.config');
+var mongoose = require('mongoose');
 
 if (!Object.keys(mongoose).length) return;
 
@@ -24,4 +24,5 @@ var VideoRequestsSchema = mongoose.Schema(
 );
 
 var videoRequestsModel = mongoose.model('VideoRequests', VideoRequestsSchema);
+
 module.exports = videoRequestsModel;

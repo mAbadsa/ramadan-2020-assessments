@@ -1,0 +1,44 @@
+const VideoRequestData = require("../data/video-requests.data");
+
+const getVideos = async (req, res, next) => {
+  const data = await VideoRequestData.getAllVideoRequests(10);
+  res.status(200).json({
+    success: true,
+    data: data,
+    errors: []
+  });
+  next();
+};
+
+const createVideo = async (req, res, next) => {
+  const response = await VideoRequestData.createRequest(req.body);
+  res.send(response);
+  next();
+};
+
+const updateVideo = async (req, res, next) => {
+  const response = await VideoRequestData.updateRequest(req.body.id, req.body);
+  res.send(response);
+  next();
+};
+
+const deleteVideo = async (req, res, next) => {
+  const response = await VideoRequestData.deleteRequest(req.body.id);
+  res.send(response);
+  next();
+};
+
+const updateVote = async (req, res, next) => {
+  const { id, vote_type } = req.body;
+  const response = await VideoRequestData.updateVoteForRequest(id, vote_type);
+  res.send(response);
+  next();
+};
+
+module.exports = {
+  getVideos,
+  createVideo,
+  updateVideo,
+  deleteVideo,
+  updateVote,
+};

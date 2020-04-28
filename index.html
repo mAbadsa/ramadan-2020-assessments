@@ -12,7 +12,7 @@
   <body>
     <div class="container my-5">
       <div class="formContainer my-5">
-        <form action="" method="POST">
+        <form id="form">
           <div class="row">
             <div class="col-md">
               <div class="form-group">
@@ -20,6 +20,7 @@
                 <input
                   class="form-control"
                   name="author_name"
+                  id="author_name"
                   placeholder="Write your name here"
                 />
               </div>
@@ -29,6 +30,7 @@
                 <label for="author_email">Your email *</label>
                 <input
                   class="form-control"
+                  id="author_email"
                   name="author_email"
                   placeholder="Write your email here"
                 />
@@ -43,6 +45,7 @@
                 <input
                   class="form-control"
                   name="topic_title"
+                  id="topic_title"
                   placeholder="Write your suggested topic here"
                 />
               </div>
@@ -53,6 +56,7 @@
                 <select
                   class="form-control"
                   name="target_level"
+                  id="target_level"
                   placeholder="Write your name here"
                 >
                   <option value="begineer">Beginner</option>
@@ -69,6 +73,7 @@
                 <textarea
                   class="form-control"
                   name="topic_details"
+                  id="topic_details"
                   placeholder="Write your topic in more details here"
                 ></textarea>
               </div>
@@ -85,7 +90,7 @@
             </div>
           </div>
 
-          <button type="submit" class="btn btn-success mt-3">
+          <button type="submit" id="submitBtn" class="btn btn-success mt-3">
             Send video request
           </button>
         </form>
@@ -125,5 +130,6 @@
         </div>
       </div>
     </div>
+    <script src="./video-request.js"></script>
   </body>
 </html>

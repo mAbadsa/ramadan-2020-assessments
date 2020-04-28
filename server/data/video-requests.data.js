@@ -1,9 +1,19 @@
-var VideoRequest = require('./../models/video-requests.model');
+const VideoRequest = require('../models/video-requests.model');
 
 module.exports = {
   createRequest: (vidRequestData) => {
     let newRequest = new VideoRequest(vidRequestData);
     return newRequest.save();
+    // let newRequest = await VideoRequest.create(vidRequestData);
+    // try {
+    //   res.status(200).json({
+    //     success: true,
+    //     data: newRequest,
+    //     errors: [],
+    //   });
+    // } catch (error) {
+    //   console.log(err);
+    // }
   },
 
   getAllVideoRequests: (top) => {
