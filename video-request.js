@@ -9,12 +9,17 @@ const listRequestedVideo = (vidInfo) => {
           <h3>${vidInfo.topic_title}</h3>
           <p class="text-muted mb-2">${vidInfo.topic_details}</p>
           <p class="mb-0 text-muted">
-            <strong>Expected results:</strong>${vidInfo.expected_result}</p>
+            ${
+              vidInfo.expected_result &&
+              `<strong>Expected results: </strong>${vidInfo.expected_result}</p>`
+            }
         </div>
         <div class="d-flex flex-column text-center">
-          <a class="btn btn-link">🔺</a>
-          <h3>0</h3>
-          <a class="btn btn-link">🔻</a>
+          <a class="btn btn-link" id="up-vote_${vidInfo._id}">🔺</a>
+          <h3 id="vote-value_${vidInfo._id}">${
+    vidInfo.votes.ups - vidInfo.votes.downs
+  }</h3>
+          <a class="btn btn-link" id="down-vote_${vidInfo._id}">🔻</a>
         </div>
       </div>
       <div class="card-footer d-flex flex-row justify-content-between">
@@ -35,7 +40,7 @@ const listRequestedVideo = (vidInfo) => {
   `;
   const vidListContainer = document.createElement("div");
   vidListContainer.innerHTML = videoListTemplate;
-  const videoItem = $listOfRequests.append(vidListContainer);
+  const videoItem = $listOfRequests.appendChild(vidListContainer);
   return videoItem;
 };
 
@@ -44,16 +49,71 @@ function renderVideoList() {
     method: "GET",
   })
     .then((data) => data.json())
-    .then(({data}) => {
+    .then(({ data }) => {
       console.log("Load...", data);
       data.forEach((video) => {
         listRequestedVideo(video);
+        const $upVote = document.getElementById(`up-vote_${video._id}`);
+        const $downVote = document.getElementById(`down-vote_${video._id}`);
+        const $voteValue = document.getElementById(`vote-value_${video._id}`);
+
+        $upVote.addEventListener("click", (e) => {
+          e.preventDefault();
+          fetch("http://localhost:7777/video-request/vote", {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              id: video._id,
+              vote_type: "ups",
+            }),
+          })
+            .then((data) => data.json())
+            .then(({ votes }) => {
+              $voteValue.innerText = votes.ups - votes.downs;
+            });
+        });
+
+        $downVote.addEventListener("click", (e) => {
+          e.preventDefault();
+          fetch("http://localhost:7777/video-request/vote", {
+            method: "PUT",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              id: video._id,
+              vote_type: "downs",
+            }),
+          })
+            .then((data) => data.json())
+            .then(({ votes }) => {
+              $voteValue.innerText = votes.ups - votes.downs;
+            });
+        });
       });
     })
     .catch((err) => {
       console.log(err);
     });
 }
+
+// function handleVotes() {
+//   $upVote.addEventListener("click", (e) => {
+//     e.preventDefault();
+//     fetch(`http://localhost:7777/video-request/vote/${id}`, {
+//       method: "PUT",
+//       headers: {
+//         "Content-Type": "application/json",
+//       },
+//       body: {
+//         _id: "",
+//         vote_type: "ups"
+//       },
+//     });
+//   });
+// }
 
 document.addEventListener("DOMContentLoaded", function () {
   $formVidReq.addEventListener("submit", (e) => {
