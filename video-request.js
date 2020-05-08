@@ -44,15 +44,15 @@ const listRequestedVideo = (vidInfo) => {
   return videoItem;
 };
 
-function renderVideoList() {
-  fetch("http://localhost:7777/video-request", {
+function renderVideoList(sortBy = "newFirst") {
+  fetch(`http://localhost:7777/video-request?sortBy=${sortBy}`, {
     method: "GET",
   })
     .then((data) => data.json())
     .then(({ data }) => {
-      console.log("Load...", data);
+      // console.log("Load...", data);
+      $listOfRequests.innerHTML = "";
       data.forEach((video) => {
-        console.log(video);
         listRequestedVideo(video);
         const $upVote = document.getElementById(`up-vote_${video._id}`);
         const $downVote = document.getElementById(`down-vote_${video._id}`);
@@ -100,23 +100,24 @@ function renderVideoList() {
     });
 }
 
-// function handleVotes() {
-//   $upVote.addEventListener("click", (e) => {
-//     e.preventDefault();
-//     fetch(`http://localhost:7777/video-request/vote/${id}`, {
-//       method: "PUT",
-//       headers: {
-//         "Content-Type": "application/json",
-//       },
-//       body: {
-//         _id: "",
-//         vote_type: "ups"
-//       },
-//     });
-//   });
-// }
-
 document.addEventListener("DOMContentLoaded", function () {
+  const $sortBy = document.querySelectorAll("[id*=sort_by_]");
+
+  $sortBy.forEach((el) => {
+    el.addEventListener("click", function (e) {
+      e.preventDefault();
+      const sortBy = this.querySelector("input");
+      renderVideoList(sortBy.value);
+      this.classList.add("active");
+      if ((sortBy.value === "topVotedFirst")) {
+        document.getElementById("sort_by_first").classList.remove("active");
+      } else {
+        document.getElementById("sort_by_top_voted").classList.remove("active");
+        // this.classList.add("active");
+      }
+    });
+  });
+
   $formVidReq.addEventListener("submit", (e) => {
     e.preventDefault();
     const formData = new FormData($formVidReq);
@@ -148,6 +149,5 @@ document.addEventListener("DOMContentLoaded", function () {
       })
       .catch((err) => console.log(err));
   });
-
   renderVideoList();
 });

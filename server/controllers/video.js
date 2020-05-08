@@ -1,7 +1,19 @@
 const VideoRequestData = require("../data/video-requests.data");
 
 const getVideos = async (req, res, next) => {
-  const data = await VideoRequestData.getAllVideoRequests(10);
+  const { sortBy } = req.query;
+  let data = await VideoRequestData.getAllVideoRequests();
+
+  if(sortBy === "topVotedFirst") {
+    data = data.sort((prev, next) => {
+      if(prev.votes.ups - prev.votes.downs > next.votes.ups - next.votes.downs) {
+        return -1;
+      } else {
+        return 1;
+      }
+    })
+  }
+
   res.status(200).json({
     success: true,
     data: data,
