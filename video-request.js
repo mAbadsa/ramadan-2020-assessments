@@ -52,6 +52,7 @@ function renderVideoList() {
     .then(({ data }) => {
       console.log("Load...", data);
       data.forEach((video) => {
+        console.log(video);
         listRequestedVideo(video);
         const $upVote = document.getElementById(`up-vote_${video._id}`);
         const $downVote = document.getElementById(`down-vote_${video._id}`);

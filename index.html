@@ -97,9 +97,17 @@
       </div>
       <hr />
       <h1 class="mb-4">List of requested videos</h1>
-      <div id="listOfRequests">
-        
+      <div class="d-flex justify-content-between mb-4">
+        <div class="btn-group btn-group-toggle" data-toggle="buttons">
+          <label for="" class="btn btn-primary active"
+            ><input type="radio" name="options" />New first
+          </label>
+          <label for="" class="btn btn-primary">
+            <input type="radio" name="options" />Top voted first
+          </label>
+        </div>
       </div>
+      <div id="listOfRequests"></div>
     </div>
     <script src="./video-request.js"></script>
   </body>
