@@ -1,23 +1,31 @@
 const VideoRequestData = require("../data/video-requests.data");
 
 const getVideos = async (req, res, next) => {
-  const { sortBy } = req.query;
-  let data = await VideoRequestData.getAllVideoRequests();
+  const { sortBy, searchTerm } = req.query;
+  let data;
+  if (searchTerm) {
+    data = await VideoRequestData.searchRequests(searchTerm);
+  } else {
+    data = await VideoRequestData.getAllVideoRequests();
+  }
 
-  if(sortBy === "topVotedFirst") {
+  if (sortBy === "topVotedFirst") {
     data = data.sort((prev, next) => {
-      if(prev.votes.ups - prev.votes.downs > next.votes.ups - next.votes.downs) {
+      if (
+        prev.votes.ups - prev.votes.downs >
+        next.votes.ups - next.votes.downs
+      ) {
         return -1;
       } else {
         return 1;
       }
-    })
+    });
   }
 
   res.status(200).json({
     success: true,
     data: data,
-    errors: []
+    errors: [],
   });
   next();
 };
