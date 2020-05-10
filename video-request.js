@@ -1,5 +1,7 @@
 const $formVidReq = document.getElementById("form");
 const $listOfRequests = document.getElementById("listOfRequests");
+let sortBy = "newFirst";
+let searchValue = "";
 
 const listRequestedVideo = (vidInfo) => {
   const videoListTemplate = `
@@ -44,10 +46,13 @@ const listRequestedVideo = (vidInfo) => {
   return videoItem;
 };
 
-function renderVideoList(sortBy = "newFirst") {
-  fetch(`http://localhost:7777/video-request?sortBy=${sortBy}`, {
-    method: "GET",
-  })
+function renderVideoList(sortBy = "newFirst", searchTerm = "") {
+  fetch(
+    `http://localhost:7777/video-request?sortBy=${sortBy}&searchTerm=${searchTerm}`,
+    {
+      method: "GET",
+    }
+  )
     .then((data) => data.json())
     .then(({ data }) => {
       // console.log("Load...", data);
@@ -100,16 +105,26 @@ function renderVideoList(sortBy = "newFirst") {
     });
 }
 
+function debounce(fn, time) {
+  let timeout;
+
+  return function (...args) {
+    clearTimeout(timeout);
+    timeout = setTimeout(() => fn.apply(this, args), time);
+  };
+}
+
 document.addEventListener("DOMContentLoaded", function () {
   const $sortBy = document.querySelectorAll("[id*=sort_by_]");
+  const $searchVideo = document.getElementById("search_video");
 
   $sortBy.forEach((el) => {
     el.addEventListener("click", function (e) {
       e.preventDefault();
-      const sortBy = this.querySelector("input");
-      renderVideoList(sortBy.value);
+      sortBy = this.querySelector("input").value;
+      renderVideoList(sortBy, searchValue);
       this.classList.add("active");
-      if ((sortBy.value === "topVotedFirst")) {
+      if (sortBy === "topVotedFirst") {
         document.getElementById("sort_by_first").classList.remove("active");
       } else {
         document.getElementById("sort_by_top_voted").classList.remove("active");
@@ -117,6 +132,15 @@ document.addEventListener("DOMContentLoaded", function () {
       }
     });
   });
+
+  $searchVideo.addEventListener(
+    "input",
+    debounce(function (e) {
+      searchValue = e.target.value;
+      // console.log(searchValue);
+      renderVideoList(sortBy, searchValue);
+    }, 500)
+  );
 
   $formVidReq.addEventListener("submit", (e) => {
     e.preventDefault();
