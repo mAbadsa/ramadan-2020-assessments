@@ -114,6 +114,43 @@ function debounce(fn, time) {
   };
 }
 
+const checkValidity = (formData) => {
+
+  const name = formData.get("author_name");
+  const email = formData.get("author_email");
+  const title = formData.get("topic_title");
+  const details = formData.get("topic_details");
+
+  const emailPattern = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+
+  if (!name) {
+    document.querySelector("[name=author_name]").classList.add("is-invalid");
+  }
+  if (!email || !emailPattern.test(email)) {
+    document.querySelector("[name=author_email]").classList.add("is-invalid");
+  }
+  if (!title || title.length > 30) {
+    document.querySelector("[name=topic_title]").classList.add("is-invalid");
+  }
+  if (!details) {
+    document.querySelector("[name=topic_details]").classList.add("is-invalid");
+  }
+
+  const invalidAllElm = document
+    .getElementById("form")
+    .querySelectorAll(".is-invalid");
+    
+  if (invalidAllElm.length) {
+    invalidAllElm.forEach((el) => {
+      el.addEventListener("input", function () {
+        this.classList.remove("is-invalid");
+      });
+    });
+    return false;
+  }
+  return true;
+};
+
 document.addEventListener("DOMContentLoaded", function () {
   const $sortBy = document.querySelectorAll("[id*=sort_by_]");
   const $searchVideo = document.getElementById("search_video");
@@ -145,17 +182,13 @@ document.addEventListener("DOMContentLoaded", function () {
   $formVidReq.addEventListener("submit", (e) => {
     e.preventDefault();
     const formData = new FormData($formVidReq);
-    // const author_name = document.getElementById("author_name").value;
-    // const author_email = document.getElementById("author_email").value;
-    // const topic_title = document.getElementById("topic_title").value;
-    // const mylist = document.getElementById("target_level");
-    // const listValue = mylist.options[mylist.selectedIndex].text;
-    // const data = {
-    //   author_name,
-    //   author_email,
-    //   topic_title,
-    //   listValue,
-    // };
+
+    const isValid = checkValidity(formData);
+
+    if (!isValid) {
+     return;
+   };
+
     fetch("http://localhost:7777/video-request", {
       method: "POST",
       //   headers: {

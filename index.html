@@ -12,28 +12,34 @@
   <body>
     <div class="container my-5">
       <div class="formContainer my-5">
-        <form id="form">
+        <form id="form" novalidate>
           <div class="row">
             <div class="col-md">
               <div class="form-group">
                 <label for="author_name">Your name *</label>
                 <input
+                  type="text"
                   class="form-control"
                   name="author_name"
                   id="author_name"
                   placeholder="Write your name here"
+                  required
                 />
+                <p class="invalid-feedback">This field is required</p>
               </div>
             </div>
             <div class="col-md">
               <div class="form-group">
                 <label for="author_email">Your email *</label>
                 <input
+                  type="email"
                   class="form-control"
                   id="author_email"
                   name="author_email"
                   placeholder="Write your email here"
+                  required
                 />
+                <p class="invalid-feedback">This field is required and should be valid email</p>
               </div>
             </div>
           </div>
@@ -43,11 +49,14 @@
               <div class="form-group">
                 <label for="topic_title">Topic *</label>
                 <input
+                  type="text"
                   class="form-control"
                   name="topic_title"
                   id="topic_title"
                   placeholder="Write your suggested topic here"
+                  required
                 />
+                <p class="invalid-feedback">This field is required and should not exceed 30 letters</p>
               </div>
             </div>
             <div class="col-md">
@@ -75,7 +84,9 @@
                   name="topic_details"
                   id="topic_details"
                   placeholder="Write your topic in more details here"
+                  required
                 ></textarea>
+                <p class="invalid-feedback">This field is required</p>
               </div>
             </div>
             <div class="col-md">
