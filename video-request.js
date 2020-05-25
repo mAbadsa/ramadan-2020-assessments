@@ -22,11 +22,11 @@ const listRequestedVideo = (vidInfo) => {
             }
         </div>
         <div class="d-flex flex-column text-center">
-          <a class="btn btn-link" id="up-vote_${vidInfo._id}">🔺</a>
+          <a class="btn btn-link" id="votse_ups_${vidInfo._id}">🔺</a>
           <h3 id="vote-value_${vidInfo._id}">${
     vidInfo.votes.ups.length - vidInfo.votes.downs.length
   }</h3>
-          <a class="btn btn-link" id="down-vote_${vidInfo._id}">🔻</a>
+          <a class="btn btn-link" id="votes_downs_${vidInfo._id}">🔻</a>
         </div>
       </div>
       <div class="card-footer d-flex flex-row justify-content-between">
@@ -64,47 +64,72 @@ function renderVideoList(sortBy = "newFirst", searchTerm = "") {
       $listOfRequests.innerHTML = "";
       data.forEach((video) => {
         listRequestedVideo(video);
-        const $upVote = document.getElementById(`up-vote_${video._id}`);
-        const $downVote = document.getElementById(`down-vote_${video._id}`);
+        // const $upVote = document.getElementById(`votes_ups_${video._id}`);
+        // const $downVote = document.getElementById(`vote_down_${video._id}`);
         const $voteValue = document.getElementById(`vote-value_${video._id}`);
+        const $voteElms = document.querySelectorAll(
+          `[id^=votes_][id$=_${video._id}]`
+        );
 
-        $upVote.addEventListener("click", (e) => {
-          e.preventDefault();
-          fetch("http://localhost:7777/video-request/vote", {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              id: video._id,
-              vote_type: "ups",
-              user_id: state.userId
-            }),
-          })
-            .then((data) => data.json())
-            .then(({ votes }) => {
-              $voteValue.innerText = votes.ups.length - votes.downs.length;
-            });
+        $voteElms.forEach((el) => {
+          el.addEventListener("click", function (e) {
+            const [ , vote_type, req_id] = e.target.getAttribute('id').split('_');
+            e.preventDefault();
+            fetch("http://localhost:7777/video-request/vote", {
+              method: "PUT",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                id: req_id,
+                vote_type,
+                user_id: state.userId,
+              }),
+            })
+              .then((data) => data.json())
+              .then(({ votes }) => {
+                $voteValue.innerText = votes.ups.length - votes.downs.length;
+              });
+          });
         });
 
-        $downVote.addEventListener("click", (e) => {
-          e.preventDefault();
-          fetch("http://localhost:7777/video-request/vote", {
-            method: "PUT",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              id: video._id,
-              vote_type: "downs",
-              user_id: state.userId
-            }),
-          })
-            .then((data) => data.json())
-            .then(({ votes }) => {
-              $voteValue.innerText = votes.ups.length - votes.downs.length;
-            });
-        });
+        // $upVote.addEventListener("click", (e) => {
+        //   e.preventDefault();
+        //   fetch("http://localhost:7777/video-request/vote", {
+        //     method: "PUT",
+        //     headers: {
+        //       "Content-Type": "application/json",
+        //     },
+        //     body: JSON.stringify({
+        //       id: video._id,
+        //       vote_type: "ups",
+        //       user_id: state.userId,
+        //     }),
+        //   })
+        //     .then((data) => data.json())
+        //     .then(({ votes }) => {
+        //       $voteValue.innerText = votes.ups.length - votes.downs.length;
+        //     });
+        // });
+
+        // $downVote.addEventListener("click", (e) => {
+        //   e.preventDefault();
+        //   fetch("http://localhost:7777/video-request/vote", {
+        //     method: "PUT",
+        //     headers: {
+        //       "Content-Type": "application/json",
+        //     },
+        //     body: JSON.stringify({
+        //       id: video._id,
+        //       vote_type: "downs",
+        //       user_id: state.userId,
+        //     }),
+        //   })
+        //     .then((data) => data.json())
+        //     .then(({ votes }) => {
+        //       $voteValue.innerText = votes.ups.length - votes.downs.length;
+        //     });
+        // });
       });
     })
     .catch((err) => {
