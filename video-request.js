@@ -22,7 +22,7 @@ const listRequestedVideo = (vidInfo) => {
             }
         </div>
         <div class="d-flex flex-column text-center">
-          <a class="btn btn-link" id="votse_ups_${vidInfo._id}">🔺</a>
+          <a class="btn btn-link" id="votes_ups_${vidInfo._id}">🔺</a>
           <h3 id="vote-value_${vidInfo._id}">${
     vidInfo.votes.ups.length - vidInfo.votes.downs.length
   }</h3>
@@ -51,6 +51,31 @@ const listRequestedVideo = (vidInfo) => {
   return videoItem;
 };
 
+function votesButtonsStyle(video_id, votes_list, votes_type) {
+  if (!votes_type) {
+    if (votes_list.ups.includes(state.userId)) {
+      votes_type = "ups";
+    } else if (votes_list.downs.includes(state.userId)) {
+      votes_type = "downs";
+    } else {
+      return;
+    }
+  }
+
+  const $upVote = document.getElementById(`votes_ups_${video_id}`);
+  const $downVote = document.getElementById(`votes_downs_${video_id}`);
+
+  const voteDirElm = votes_type === "ups" ? $upVote : $downVote;
+  const otherElms = votes_type === "ups" ? $downVote : $upVote;
+
+  if (votes_list[votes_type].includes(state.userId)) {
+    voteDirElm.style.opacity = "1";
+    otherElms.style.opacity = "0.6";
+  } else {
+    otherElms.style.opacity = "1";
+  }
+}
+
 function renderVideoList(sortBy = "newFirst", searchTerm = "") {
   fetch(
     `http://localhost:7777/video-request?sortBy=${sortBy}&searchTerm=${searchTerm}`,
@@ -64,8 +89,9 @@ function renderVideoList(sortBy = "newFirst", searchTerm = "") {
       $listOfRequests.innerHTML = "";
       data.forEach((video) => {
         listRequestedVideo(video);
-        // const $upVote = document.getElementById(`votes_ups_${video._id}`);
-        // const $downVote = document.getElementById(`vote_down_${video._id}`);
+
+        votesButtonsStyle(video._id, video.votes);
+
         const $voteValue = document.getElementById(`vote-value_${video._id}`);
         const $voteElms = document.querySelectorAll(
           `[id^=votes_][id$=_${video._id}]`
@@ -73,7 +99,7 @@ function renderVideoList(sortBy = "newFirst", searchTerm = "") {
 
         $voteElms.forEach((el) => {
           el.addEventListener("click", function (e) {
-            const [ , vote_type, req_id] = e.target.getAttribute('id').split('_');
+            const [, votes_type, id] = e.target.getAttribute("id").split("_");
             e.preventDefault();
             fetch("http://localhost:7777/video-request/vote", {
               method: "PUT",
@@ -81,14 +107,15 @@ function renderVideoList(sortBy = "newFirst", searchTerm = "") {
                 "Content-Type": "application/json",
               },
               body: JSON.stringify({
-                id: req_id,
-                vote_type,
+                id,
+                votes_type,
                 user_id: state.userId,
               }),
             })
               .then((data) => data.json())
               .then(({ votes }) => {
                 $voteValue.innerText = votes.ups.length - votes.downs.length;
+                votesButtonsStyle(id, votes, votes_type);
               });
           });
         });
