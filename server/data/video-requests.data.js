@@ -1,12 +1,12 @@
 const VideoRequest = require("../models/video-requests.model");
-const User = require('../models/user.model');
+const User = require("../models/user.model");
 
 module.exports = {
   createRequest: async (vidRequestData) => {
     const userId = vidRequestData.author_id;
 
-    if(userId) {
-      const userObj = await User.findOne({_id: userId});
+    if (userId) {
+      const userObj = await User.findOne({ _id: userId });
       vidRequestData.author_name = userObj.author_name;
       vidRequestData.author_email = userObj.author_email;
     }
@@ -30,9 +30,10 @@ module.exports = {
   },
 
   searchRequests: (topic) => {
-    return VideoRequest.find({ topic_title: { $regex: topic, $options: "i" } })
-      .sort({ addedAt: "-1" })
-      // .limit(top);
+    return VideoRequest.find({
+      topic_title: { $regex: topic, $options: "i" },
+    }).sort({ addedAt: "-1" });
+    // .limit(top);
   },
 
   getRequestById: (id) => {
@@ -43,15 +44,29 @@ module.exports = {
     return VideoRequest.findByIdAndUpdate(id, newVidDetails);
   },
 
-  updateVoteForRequest: async (id, vote_type) => {
+  updateVoteForRequest: async (id, vote_type, user_id) => {
     const oldRequest = await VideoRequest.findById({ _id: id });
     const other_type = vote_type === "ups" ? "downs" : "ups";
+
+    const oldVoteList = oldRequest.votes[vote_type];
+    const oldOtherList = oldRequest.votes[other_type];
+
+    if (!oldVoteList.find((user) => user === user_id)) {
+      oldVoteList.push(user_id);
+    } else {
+      oldVoteList.splice(user_id);
+    }
+
+    if (oldOtherList.find((user) => user === user_id)) {
+      oldVoteList.splice(user_id);
+    }
+
     return VideoRequest.findByIdAndUpdate(
       { _id: id },
       {
         votes: {
-          [vote_type]: ++oldRequest.votes[vote_type],
-          [other_type]: oldRequest.votes[other_type],
+          [vote_type]: oldVoteList,
+          [other_type]: oldOtherList,
         },
       },
       { new: true }

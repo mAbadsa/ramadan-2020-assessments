@@ -24,7 +24,7 @@ const listRequestedVideo = (vidInfo) => {
         <div class="d-flex flex-column text-center">
           <a class="btn btn-link" id="up-vote_${vidInfo._id}">🔺</a>
           <h3 id="vote-value_${vidInfo._id}">${
-    vidInfo.votes.ups - vidInfo.votes.downs
+    vidInfo.votes.ups.length - vidInfo.votes.downs.length
   }</h3>
           <a class="btn btn-link" id="down-vote_${vidInfo._id}">🔻</a>
         </div>
@@ -78,11 +78,12 @@ function renderVideoList(sortBy = "newFirst", searchTerm = "") {
             body: JSON.stringify({
               id: video._id,
               vote_type: "ups",
+              user_id: state.userId
             }),
           })
             .then((data) => data.json())
             .then(({ votes }) => {
-              $voteValue.innerText = votes.ups - votes.downs;
+              $voteValue.innerText = votes.ups.length - votes.downs.length;
             });
         });
 
@@ -96,11 +97,12 @@ function renderVideoList(sortBy = "newFirst", searchTerm = "") {
             body: JSON.stringify({
               id: video._id,
               vote_type: "downs",
+              user_id: state.userId
             }),
           })
             .then((data) => data.json())
             .then(({ votes }) => {
-              $voteValue.innerText = votes.ups - votes.downs;
+              $voteValue.innerText = votes.ups.length - votes.downs.length;
             });
         });
       });
