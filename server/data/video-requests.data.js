@@ -44,11 +44,11 @@ module.exports = {
     return VideoRequest.findByIdAndUpdate(id, newVidDetails);
   },
 
-  updateVoteForRequest: async (id, vote_type, user_id) => {
+  updateVoteForRequest: async (id, votes_type, user_id) => {
     const oldRequest = await VideoRequest.findById({ _id: id });
-    const other_type = vote_type === "ups" ? "downs" : "ups";
+    const other_type = votes_type === "ups" ? "downs" : "ups";
 
-    const oldVoteList = oldRequest.votes[vote_type];
+    const oldVoteList = oldRequest.votes[votes_type];
     const oldOtherList = oldRequest.votes[other_type];
 
     if (!oldVoteList.find((user) => user === user_id)) {
@@ -58,14 +58,14 @@ module.exports = {
     }
 
     if (oldOtherList.find((user) => user === user_id)) {
-      oldVoteList.splice(user_id);
+      oldOtherList.splice(user_id);
     }
 
     return VideoRequest.findByIdAndUpdate(
       { _id: id },
       {
         votes: {
-          [vote_type]: oldVoteList,
+          [votes_type]: oldVoteList,
           [other_type]: oldOtherList,
         },
       },

@@ -49,8 +49,12 @@ const deleteVideo = async (req, res, next) => {
 };
 
 const updateVote = async (req, res, next) => {
-  const { id, vote_type, user_id } = req.body;
-  const response = await VideoRequestData.updateVoteForRequest(id, vote_type, user_id);
+  const { id, votes_type, user_id } = req.body;
+  const response = await VideoRequestData.updateVoteForRequest(
+    id,
+    votes_type,
+    user_id
+  );
   res.send(response);
   next();
 };
