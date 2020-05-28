@@ -17,7 +17,7 @@ var VideoRequestsSchema = mongoose.Schema(
     status: { type: String, default: "new" },
     video_ref: {
       link: { type: String, default: "" },
-      date: { type: String, default: "" },
+      date: { type: Date, default: "" },
     },
   },
   { timestamps: { createdAt: "submit_date", updatedAt: "update_date" } }

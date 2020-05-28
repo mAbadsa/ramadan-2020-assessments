@@ -55,97 +55,105 @@
         </form>
       </div>
       <div class="app-content d-none">
-        <div class="formContainer my-5">
-          <form id="form" novalidate>
-            <div class="row">
-              <div class="col-md">
-                <div class="form-group">
-                  <label for="topic_title">Topic *</label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    name="topic_title"
-                    id="topic_title"
-                    placeholder="Write your suggested topic here"
-                    required
-                  />
-                  <p class="invalid-feedback">
-                    This field is required and should not exceed 30 letters
-                  </p>
+        <div class="normal-user-content">
+          <div class="formContainer my-5">
+            <form id="form" novalidate>
+              <div class="row">
+                <div class="col-md">
+                  <div class="form-group">
+                    <label for="topic_title">Topic *</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      name="topic_title"
+                      id="topic_title"
+                      placeholder="Write your suggested topic here"
+                      required
+                    />
+                    <p class="invalid-feedback">
+                      This field is required and should not exceed 30 letters
+                    </p>
+                  </div>
+                </div>
+                <div class="col-md">
+                  <div class="form-group">
+                    <label for="target_level">Target level</label>
+                    <select
+                      class="form-control"
+                      name="target_level"
+                      id="target_level"
+                      placeholder="Write your name here"
+                    >
+                      <option value="begineer">Beginner</option>
+                      <option value="medium">Medium</option>
+                      <option value="advanced">Advanced</option>
+                    </select>
+                  </div>
                 </div>
               </div>
-              <div class="col-md">
-                <div class="form-group">
-                  <label for="target_level">Target level</label>
-                  <select
-                    class="form-control"
-                    name="target_level"
-                    id="target_level"
-                    placeholder="Write your name here"
-                  >
-                    <option value="begineer">Beginner</option>
-                    <option value="medium">Medium</option>
-                    <option value="advanced">Advanced</option>
-                  </select>
+              <div class="row">
+                <div class="col-md">
+                  <div class="form-group">
+                    <label for="topic_details">More details *</label>
+                    <textarea
+                      class="form-control"
+                      name="topic_details"
+                      id="topic_details"
+                      placeholder="Write your topic in more details here"
+                      required
+                    ></textarea>
+                    <p class="invalid-feedback">This field is required</p>
+                  </div>
+                </div>
+                <div class="col-md">
+                  <div class="form-group">
+                    <label for="expected_result">Expected results</label>
+                    <textarea
+                      class="form-control"
+                      name="expected_result"
+                      placeholder="Write what do you expect after watching this video"
+                    ></textarea>
+                  </div>
                 </div>
               </div>
-            </div>
-            <div class="row">
-              <div class="col-md">
-                <div class="form-group">
-                  <label for="topic_details">More details *</label>
-                  <textarea
-                    class="form-control"
-                    name="topic_details"
-                    id="topic_details"
-                    placeholder="Write your topic in more details here"
-                    required
-                  ></textarea>
-                  <p class="invalid-feedback">This field is required</p>
-                </div>
-              </div>
-              <div class="col-md">
-                <div class="form-group">
-                  <label for="expected_result">Expected results</label>
-                  <textarea
-                    class="form-control"
-                    name="expected_result"
-                    placeholder="Write what do you expect after watching this video"
-                  ></textarea>
-                </div>
-              </div>
-            </div>
 
-            <button type="submit" id="submitBtn" class="btn btn-success mt-3">
-              Send video request
-            </button>
-          </form>
-        </div>
-        <hr />
-        <h1 class="mb-4">List of requested videos</h1>
-        <div class="row">
-          <div class="col-6">
-            <div class="d-flex justify-content-between mb-4">
-              <div class="btn-group btn-group-toggle" data-toggle="buttons">
-                <label for="" class="btn btn-primary active" id="sort_by_first"
-                  ><input type="radio" name="options" value="newFirst" />New
-                  first
-                </label>
-                <label for="" class="btn btn-primary" id="sort_by_top_voted">
-                  <input type="radio" name="options" value="topVotedFirst" />Top
-                  voted first
-                </label>
+              <button type="submit" id="submitBtn" class="btn btn-success mt-3">
+                Send video request
+              </button>
+            </form>
+          </div>
+          <hr />
+          <h1 class="mb-4">List of requested videos</h1>
+          <div class="row">
+            <div class="col-6">
+              <div class="d-flex justify-content-between mb-4">
+                <div class="btn-group btn-group-toggle" data-toggle="buttons">
+                  <label
+                    for=""
+                    class="btn btn-primary active"
+                    id="sort_by_first"
+                    ><input type="radio" name="options" value="newFirst" />New
+                    first
+                  </label>
+                  <label for="" class="btn btn-primary" id="sort_by_top_voted">
+                    <input
+                      type="radio"
+                      name="options"
+                      value="topVotedFirst"
+                    />Top voted first
+                  </label>
+                </div>
               </div>
             </div>
-          </div>
-          <div class="col-6 d-flex justify-content-end">
-            <div class="form-group w-75">
-              <input
-                type="search"
-                class="form-control"
-                id="search_video"
-                placeholder="Type your search term"
-              />
+            <div class="col-6 d-flex justify-content-end">
+              <div class="form-group w-75">
+                <input
+                  type="search"
+                  class="form-control"
+                  id="search_video"
+                  placeholder="Type your search term"
+                />
+              </div>
             </div>
           </div>
         </div>

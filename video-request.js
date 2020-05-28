@@ -1,16 +1,45 @@
 const $formVidReq = document.getElementById("form");
 const $listOfRequests = document.getElementById("listOfRequests");
+const SUPER_USER_ID = "Aa8C052FBb00E9ee";
 // const $loginForm = document.getElementById("login_form");
 
 const state = {
   sortBy: "newFirst",
   searchValue: "",
   userId: "",
+  isSuperUser: false,
 };
 
 const listRequestedVideo = (vidInfo) => {
   const videoListTemplate = `
     <div class="card mb-3">
+    ${
+      state.isSuperUser
+        ? `<div class="card-header d-flex justify-content-between">
+        <select id="admin_change-status_${vidInfo._id}" value="">
+          <option value="new">New</option>
+          <option value="planned">Planned</option>
+          <option value="done">Done</option>
+        </select>
+        <div class="input-group ml-2 mr-5 ${
+          vidInfo.status !== "done" ? "d-none" : ""
+        }" id="admin_video_res_container_${vidInfo._id}">
+          <input type="text" class="form-control"
+            id="admin_video_res_${vidInfo._id}"
+            placeholder="Paste here youtube video id"/>
+          <div class="input-group-append">
+            <button class="btn btn-outline-secondary"
+              type="button"
+              id="admin_save_video_res_${vidInfo._id}"
+            >Save</button>
+          </div>
+        </div>
+        <button class="btn btn-danger"
+        id="admin_delete_video_res_${vidInfo._id}"
+        >Delete</button>
+      </div>`
+        : ""
+    }
       <div class="card-body d-flex justify-content-between flex-row">
         <div class="d-flex flex-column">
           <h3>${vidInfo.topic_title}</h3>
@@ -52,6 +81,17 @@ const listRequestedVideo = (vidInfo) => {
 };
 
 function votesButtonsStyle(video_id, votes_list, votes_type) {
+  const $upVote = document.getElementById(`votes_ups_${video_id}`);
+  const $downVote = document.getElementById(`votes_downs_${video_id}`);
+
+  if (state.isSuperUser) {
+    $upVote.style.opacity = "0.5";
+    $upVote.style.cursor = "not-allowed";
+    $downVote.style.opacity = "0.5";
+    $downVote.style.cursor = "not-allowed";
+    return;
+  }
+
   if (!votes_type) {
     if (votes_list.ups.includes(state.userId)) {
       votes_type = "ups";
@@ -62,9 +102,6 @@ function votesButtonsStyle(video_id, votes_list, votes_type) {
     }
   }
 
-  const $upVote = document.getElementById(`votes_ups_${video_id}`);
-  const $downVote = document.getElementById(`votes_downs_${video_id}`);
-
   const voteDirElm = votes_type === "ups" ? $upVote : $downVote;
   const otherElms = votes_type === "ups" ? $downVote : $upVote;
 
@@ -74,6 +111,26 @@ function votesButtonsStyle(video_id, votes_list, votes_type) {
   } else {
     otherElms.style.opacity = "1";
   }
+}
+
+function updateVideoRequest(id, status, resVideo = "") {
+  fetch("http://localhost:7777/video-request", {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      id,
+      status,
+      resVideo,
+    }),
+  })
+    .then((res) => res.json())
+    .then((data) => {
+      window.location.reload();
+      console.log(data);
+    })
+    .catch((err) => console.log(err));
 }
 
 function renderVideoList(sortBy = "newFirst", searchTerm = "") {
@@ -90,6 +147,76 @@ function renderVideoList(sortBy = "newFirst", searchTerm = "") {
       data.forEach((video) => {
         listRequestedVideo(video);
 
+        const $adminStatusElm = document.getElementById(
+          `admin_change-status_${video._id}`
+        );
+        const $adminVideoResElm = document.getElementById(
+          `admin_video_res_${video._id}`
+        );
+        const $adminVideoResContainer = document.getElementById(
+          `admin_video_res_container_${video._id}`
+        );
+        const $adminSaveElm = document.getElementById(
+          `admin_save_video_res_${video._id}`
+        );
+        const $adminDeleteElm = document.getElementById(
+          `admin_delete_video_res_${video._id}`
+        );
+
+        if (state.isSuperUser) {
+          $adminStatusElm.value = video.status;
+          $adminVideoResElm.value = video.video_ref.link;
+
+          // Update Video Status
+          $adminStatusElm.addEventListener("change", (e) => {
+            if (e.target.value === "done") {
+              $adminVideoResContainer.classList.remove("d-none");
+            } else {
+              updateVideoRequest(video._id, e.target.value);
+            }
+          });
+
+          // Delete Video Res
+          $adminDeleteElm.addEventListener("click", (e) => {
+            // Make Sure Before You want To Delete Items
+            const isSure = confirm(
+              `Are you sure you are want to delete ${video.topic_title}`
+            );
+
+            if (!isSure) return;
+
+            fetch("http://localhost:7777/video-request", {
+              method: "DELETE",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              body: JSON.stringify({
+                id: video._id,
+              }),
+            })
+              .then((res) => res.json())
+              .then((data) => {
+                window.location.reload();
+                console.log(data);
+              })
+              .catch((err) => console.log(err));
+          });
+
+          // Add Video Res
+          $adminSaveElm.addEventListener("click", (e) => {
+            e.preventDefault();
+            if (!$adminVideoResElm.value) {
+              $adminVideoResElm.classList.add("is-invalid");
+              $adminVideoResElm.addEventListener("input", (e) => {
+                $adminVideoResElm.classList.remove("is-invalid");
+              });
+              return;
+            }
+
+            updateVideoRequest(video._id, "done", $adminVideoResElm.value);
+          });
+        }
+
         votesButtonsStyle(video._id, video.votes);
 
         const $voteValue = document.getElementById(`vote-value_${video._id}`);
@@ -98,6 +225,7 @@ function renderVideoList(sortBy = "newFirst", searchTerm = "") {
         );
 
         $voteElms.forEach((el) => {
+          if (state.isSuperUser) return;
           el.addEventListener("click", function (e) {
             const [, votes_type, id] = e.target.getAttribute("id").split("_");
             e.preventDefault();
@@ -239,8 +367,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
   const $loginForm = document.querySelector(".login-form");
   const $appContent = document.querySelector(".app-content");
+
   if (window.location.search) {
     state.userId = new URLSearchParams(window.location.search).get("id");
+
+    if (state.userId === SUPER_USER_ID) {
+      state.isSuperUser = true;
+      const $normalUserContent = document.querySelector(".normal-user-content");
+      $normalUserContent.classList.add("d-none");
+    }
+
     $loginForm.classList.add("d-none");
     $appContent.classList.remove("d-none");
   }

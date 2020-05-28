@@ -37,7 +37,8 @@ const createVideo = async (req, res, next) => {
 };
 
 const updateVideo = async (req, res, next) => {
-  const response = await VideoRequestData.updateRequest(req.body.id, req.body);
+  const { id, status, resVideo } = req.body;
+  const response = await VideoRequestData.updateRequest(id, status, resVideo);
   res.send(response);
   next();
 };
