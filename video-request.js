@@ -6,6 +6,7 @@ const SUPER_USER_ID = "Aa8C052FBb00E9ee";
 const state = {
   sortBy: "newFirst",
   searchValue: "",
+  filterBy: "all",
   userId: "",
   isSuperUser: false,
 };
@@ -152,9 +153,13 @@ function updateVideoRequest(id, status, resVideo = "") {
     .catch((err) => console.log(err));
 }
 
-function renderVideoList(sortBy = "newFirst", searchTerm = "") {
+function renderVideoList(
+  sortBy = "newFirst",
+  searchTerm = "",
+  filterBy = "all"
+) {
   fetch(
-    `http://localhost:7777/video-request?sortBy=${sortBy}&searchTerm=${searchTerm}`,
+    `http://localhost:7777/video-request?sortBy=${sortBy}&searchTerm=${searchTerm}&filterBy=${filterBy}`,
     {
       method: "GET",
     }
@@ -364,12 +369,26 @@ const checkValidity = (formData) => {
 document.addEventListener("DOMContentLoaded", function () {
   const $sortBy = document.querySelectorAll("[id*=sort_by_]");
   const $searchVideo = document.getElementById("search_video");
+  const $filteredByElms = document.querySelectorAll("[id^=filter_by_]");
+  console.log($filteredByElms);
+
+  $filteredByElms.forEach((el) => {
+    el.addEventListener("click", function (e) {
+      e.preventDefault();
+      const [, , filterBy] = e.target.getAttribute("id").split("_");
+      state.filterBy = filterBy;
+      $filteredByElms.forEach((el) => el.classList.remove("active"));
+      e.target.classList.add("active");
+      renderVideoList(state.sortBy, state.searchValue, state.filterBy);
+    });
+  });
 
   $sortBy.forEach((el) => {
     el.addEventListener("click", function (e) {
       e.preventDefault();
       state.sortBy = this.querySelector("input").value;
-      renderVideoList(state.sortBy, state.searchValue);
+      console.log(state.sortBy);
+      renderVideoList(state.sortBy, state.searchValue, state.filterBy);
       this.classList.add("active");
       if (state.sortBy === "topVotedFirst") {
         document.getElementById("sort_by_first").classList.remove("active");
@@ -385,7 +404,7 @@ document.addEventListener("DOMContentLoaded", function () {
     debounce(function (e) {
       state.searchValue = e.target.value;
       // console.log(searchValue);
-      renderVideoList(state.sortBy, state.searchValue);
+      renderVideoList(state.sortBy, state.searchValue, state.filterBy);
     }, 500)
   );
 
@@ -432,27 +451,6 @@ document.addEventListener("DOMContentLoaded", function () {
       })
       .catch((err) => console.log(err));
   });
-
-  // $loginForm.addEventListener("submit", (e) => {
-  //   e.preventDefault();
-
-  //   const formData = new FormData($loginForm);
-
-  //   fetch("http://localhost:7777/users/login", {
-  //     method: "POST",
-  //     body: formData,
-  //   })
-  //     .then((data) => {
-  //       console.log(formData);
-  //       return data.json();
-  //     })
-  //     .then((result) => {
-  //       console.log(result);
-  //     })
-  //     .catch((err) => {
-  //       console.log(err);
-  //     });
-  // });
 
   renderVideoList();
 });
