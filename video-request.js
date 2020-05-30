@@ -50,6 +50,15 @@ const listRequestedVideo = (vidInfo) => {
               `<strong>Expected results: </strong>${vidInfo.expected_result}</p>`
             }
         </div>
+        ${
+          vidInfo.status === "done"
+            ? `
+        <div class="ml-auto mr-3">
+          <iframe width="240" height="135" src="https://www.youtube.com/embed/${vidInfo.video_ref.link}" frameborder="0" allowfullscreen>
+          </iframe>
+        </div>`
+            : ""
+        }
         <div class="d-flex flex-column text-center">
           <a class="btn btn-link" id="votes_ups_${vidInfo._id}">🔺</a>
           <h3 id="vote-value_${vidInfo._id}">${
@@ -59,8 +68,18 @@ const listRequestedVideo = (vidInfo) => {
         </div>
       </div>
       <div class="card-footer d-flex flex-row justify-content-between">
-        <div>
-          <span class="text-info">${vidInfo.status.toUpperCase()}</span>
+        <div class="${
+          vidInfo.status === "done"
+            ? "text-success"
+            : vidInfo.status === "planned"
+            ? "text-primary"
+            : ""
+        }">
+          <span class="text-info">${vidInfo.status.toUpperCase()} ${
+    vidInfo.status === "done"
+      ? `on ${new Date(vidInfo.video_ref.date).toLocaleDateString()}`
+      : ""
+  }</span>
           &bullet; added by <strong>${vidInfo.author_name}</strong> on
           <strong>${new Date(vidInfo.update_date).toLocaleDateString()}</strong>
         </div>
@@ -80,11 +99,11 @@ const listRequestedVideo = (vidInfo) => {
   return videoItem;
 };
 
-function votesButtonsStyle(video_id, votes_list, votes_type) {
+function votesButtonsStyle(video_id, votes_list, isDisabled, votes_type) {
   const $upVote = document.getElementById(`votes_ups_${video_id}`);
   const $downVote = document.getElementById(`votes_downs_${video_id}`);
 
-  if (state.isSuperUser) {
+  if (state.isSuperUser || isDisabled) {
     $upVote.style.opacity = "0.5";
     $upVote.style.cursor = "not-allowed";
     $downVote.style.opacity = "0.5";
@@ -217,7 +236,7 @@ function renderVideoList(sortBy = "newFirst", searchTerm = "") {
           });
         }
 
-        votesButtonsStyle(video._id, video.votes);
+        votesButtonsStyle(video._id, video.votes, video.status === "done");
 
         const $voteValue = document.getElementById(`vote-value_${video._id}`);
         const $voteElms = document.querySelectorAll(
@@ -225,7 +244,7 @@ function renderVideoList(sortBy = "newFirst", searchTerm = "") {
         );
 
         $voteElms.forEach((el) => {
-          if (state.isSuperUser) return;
+          if (state.isSuperUser || video.status === "done") return;
           el.addEventListener("click", function (e) {
             const [, votes_type, id] = e.target.getAttribute("id").split("_");
             e.preventDefault();
@@ -243,7 +262,12 @@ function renderVideoList(sortBy = "newFirst", searchTerm = "") {
               .then((data) => data.json())
               .then(({ votes }) => {
                 $voteValue.innerText = votes.ups.length - votes.downs.length;
-                votesButtonsStyle(id, votes, votes_type);
+                votesButtonsStyle(
+                  id,
+                  votes,
+                  video.status === "done",
+                  votes_type
+                );
               });
           });
         });
